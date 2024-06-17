@@ -1,0 +1,40 @@
+body{
+    background-image:url(imagem/wp5694435.webp);
+    background-repeat: no-repeat;
+    background-size:cover;
+}
+.card-body{
+    background-color: black;
+    color: aliceblue;
+}
+
+.pai{
+    justify-content: space-between;
+    display: flex;
+    justify-items: center;
+}
+.card-img-top{
+    max-height: 40rem;
+}
+.card{
+    margin-top: 10px;
+}
+.arco1{
+    background-color: greenyellow;
+}
+.arco2{
+    background-color: gold;
+}
+.arco3{
+    background-color: brown;
+}
+.navbar-brand{
+    border: 5px outset grey;
+}
+.card{
+    border: 10px inset darkgreen;
+    margin: 3%;
+}
+.form-control{
+    margin-left: 450px;
+}
