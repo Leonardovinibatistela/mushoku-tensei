@@ -1139,10 +1139,10 @@
 
         atualizarPainelAvisos(vencidosList, urgentesList);
         renderizarSidebarPastas();
-        atualizarGraficos(anoSelecionado);
+        atualizarGraficos(anoSelecionado, mesSelecionado);
     }
 
-    function atualizarGraficos(anoSelecionado) {
+    function atualizarGraficos(anoSelecionado, mesSelecionado) {
         const nomesMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
         let lucrosPorMes = new Array(12).fill(0);
         let pendentesPorMes = new Array(12).fill(0);
@@ -1169,14 +1169,16 @@
                         pendentesPorMes[mesReg] += val;
                         pendentesDetalhesPorMes[mesReg].push(`${reg.placa} (${reg.empresa}): R$ ${val.toFixed(2)}`);
                     }
-                }
-            }
 
-            const tipo = reg.tipoServico || 'Outros';
-            if (contagemTipos.hasOwnProperty(tipo)) {
-                contagemTipos[tipo]++;
-            } else {
-                contagemTipos['Outros']++;
+                    if (mesReg === mesSelecionado) {
+                        const tipo = reg.tipoServico || 'Outros';
+                        if (contagemTipos.hasOwnProperty(tipo)) {
+                            contagemTipos[tipo]++;
+                        } else {
+                            contagemTipos['Outros']++;
+                        }
+                    }
+                }
             }
         });
 
@@ -1258,18 +1260,32 @@
         const ctxPizza = document.getElementById('chartPizzaServicos').getContext('2d');
         if (chartPizza) chartPizza.destroy();
 
+        const totalServicosPizza = contagemTipos['Lubrificação'] + contagemTipos['Troca de Óleo'] + contagemTipos['Lubrificação + Troca de Óleo'] + contagemTipos['Outros'];
+
+        let pizzaLabels, pizzaData, pizzaColors;
+
+        if (totalServicosPizza === 0) {
+            pizzaLabels = ['Sem registros no mês'];
+            pizzaData = [1];
+            pizzaColors = ['#334155'];
+        } else {
+            pizzaLabels = ['Lubrificação', 'Troca de Óleo', 'Lubrificação + Óleo', 'Outros'];
+            pizzaData = [
+                contagemTipos['Lubrificação'],
+                contagemTipos['Troca de Óleo'],
+                contagemTipos['Lubrificação + Troca de Óleo'],
+                contagemTipos['Outros']
+            ];
+            pizzaColors = ['#3b82f6', '#38bdf8', '#818cf8', '#94a3b8'];
+        }
+
         chartPizza = new Chart(ctxPizza, {
             type: 'pie',
             data: {
-                labels: ['Lubrificação', 'Troca de Óleo', 'Lubrificação + Óleo', 'Outros'],
+                labels: pizzaLabels,
                 datasets: [{
-                    data: [
-                        contagemTipos['Lubrificação'],
-                        contagemTipos['Troca de Óleo'],
-                        contagemTipos['Lubrificação + Troca de Óleo'],
-                        contagemTipos['Outros']
-                    ],
-                    backgroundColor: ['#3b82f6', '#38bdf8', '#818cf8', '#94a3b8'],
+                    data: pizzaData,
+                    backgroundColor: pizzaColors,
                     borderWidth: 1,
                     borderColor: '#1e293b'
                 }]
@@ -1281,6 +1297,9 @@
                     legend: {
                         position: 'bottom',
                         labels: { color: '#f8fafc', font: { size: 11 } }
+                    },
+                    tooltip: {
+                        enabled: totalServicosPizza > 0
                     }
                 }
             }
